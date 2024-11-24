@@ -41,64 +41,59 @@ https://rutube.ru/video/de0451ffc04a63d0866f2f3fe53159e6/
 ![1](https://github.com/s2023alek/online-mmo-game-map-editor/blob/e87be97051c87f573f5338f7eb9b3b0d438ece47/README/appdesc.PNG)
 ![1](https://github.com/s2023alek/online-mmo-game-map-editor/blob/e87be97051c87f573f5338f7eb9b3b0d438ece47/README/uidesc.PNG)
 
-![1](https://github.com/s2023alek/online-mmo-game-map-editor/blob/e87be97051c87f573f5338f7eb9b3b0d438ece47/README/a1.PNG)
-![1](https://github.com/s2023alek/online-mmo-game-map-editor/blob/e87be97051c87f573f5338f7eb9b3b0d438ece47/README/a2.PNG)
-![1](https://github.com/s2023alek/online-mmo-game-map-editor/blob/e87be97051c87f573f5338f7eb9b3b0d438ece47/README/a3.PNG)
-![1](https://github.com/s2023alek/online-mmo-game-map-editor/blob/e87be97051c87f573f5338f7eb9b3b0d438ece47/README/a4.PNG)
-![1](https://github.com/s2023alek/online-mmo-game-map-editor/blob/e87be97051c87f573f5338f7eb9b3b0d438ece47/README/a5.PNG)
 
 ### последняя версия интерфейса редактора:  
 
 
 ждать завершения загрузки редактора карт  
-![1](https://github.com/s2023alek/online-mmo-game-map-editor/blob/e87be97051c87f573f5338f7eb9b3b0d438ece47/README/0.JPG)
-![1](https://github.com/s2023alek/online-mmo-game-map-editor/blob/e87be97051c87f573f5338f7eb9b3b0d438ece47/README/1.JPG)
-![1](https://github.com/s2023alek/online-mmo-game-map-editor/blob/e87be97051c87f573f5338f7eb9b3b0d438ece47/README/2.JPG)
-![1](https://github.com/s2023alek/online-mmo-game-map-editor/blob/e87be97051c87f573f5338f7eb9b3b0d438ece47/README/3.JPG)
-![1](https://github.com/s2023alek/online-mmo-game-map-editor/blob/e87be97051c87f573f5338f7eb9b3b0d438ece47/README/4.JPG)
-![1](https://github.com/s2023alek/online-mmo-game-map-editor/blob/e87be97051c87f573f5338f7eb9b3b0d438ece47/README/5.JPG)
-![1](https://github.com/s2023alek/online-mmo-game-map-editor/blob/e87be97051c87f573f5338f7eb9b3b0d438ece47/README/6.JPG)
+![1](https://github.com/s2023alek/online-mmo-game-map-editor/blob/193b6671fdd3d35eea445b8965b2053f60985019/README/0.PNG)
+![1](https://github.com/s2023alek/online-mmo-game-map-editor/blob/193b6671fdd3d35eea445b8965b2053f60985019/README/1.PNG)
+![1](https://github.com/s2023alek/online-mmo-game-map-editor/blob/193b6671fdd3d35eea445b8965b2053f60985019/README/2.PNG)
+![1](https://github.com/s2023alek/online-mmo-game-map-editor/blob/193b6671fdd3d35eea445b8965b2053f60985019/README/3.PNG)
+![1](https://github.com/s2023alek/online-mmo-game-map-editor/blob/193b6671fdd3d35eea445b8965b2053f60985019/README/4.PNG)
+![1](https://github.com/s2023alek/online-mmo-game-map-editor/blob/193b6671fdd3d35eea445b8965b2053f60985019/README/5.PNG)
+![1](https://github.com/s2023alek/online-mmo-game-map-editor/blob/193b6671fdd3d35eea445b8965b2053f60985019/README/6.PNG)
 
 ждать завершения загрузки редактора фона карты  
-![1](https://github.com/s2023alek/online-mmo-game-map-editor/blob/e87be97051c87f573f5338f7eb9b3b0d438ece47/README/7.JPG)
-![1](https://github.com/s2023alek/online-mmo-game-map-editor/blob/e87be97051c87f573f5338f7eb9b3b0d438ece47/README/8.JPG)
-![1](https://github.com/s2023alek/online-mmo-game-map-editor/blob/e87be97051c87f573f5338f7eb9b3b0d438ece47/README/9.JPG)
+![1](https://github.com/s2023alek/online-mmo-game-map-editor/blob/193b6671fdd3d35eea445b8965b2053f60985019/README/7.PNG)
+![1](https://github.com/s2023alek/online-mmo-game-map-editor/blob/193b6671fdd3d35eea445b8965b2053f60985019/README/8.PNG)
+![1](https://github.com/s2023alek/online-mmo-game-map-editor/blob/193b6671fdd3d35eea445b8965b2053f60985019/README/9.PNG)
 
-![1](https://github.com/s2023alek/online-mmo-game-map-editor/blob/e87be97051c87f573f5338f7eb9b3b0d438ece47/README/10.JPG)
-![1](https://github.com/s2023alek/online-mmo-game-map-editor/blob/e87be97051c87f573f5338f7eb9b3b0d438ece47/README/11.JPG)
+![1](https://github.com/s2023alek/online-mmo-game-map-editor/blob/193b6671fdd3d35eea445b8965b2053f60985019/README/10.PNG)
+![1](https://github.com/s2023alek/online-mmo-game-map-editor/blob/193b6671fdd3d35eea445b8965b2053f60985019/README/11.PNG)
 
 нажать на кнопку чтобы назначить горячую клавишу для образца  
-![1](https://github.com/s2023alek/online-mmo-game-map-editor/blob/e87be97051c87f573f5338f7eb9b3b0d438ece47/README/12.JPG)
+![1](https://github.com/s2023alek/online-mmo-game-map-editor/blob/193b6671fdd3d35eea445b8965b2053f60985019/README/12.PNG)
 
 нажать клавишу R  на клавиатуре  
-![1](https://github.com/s2023alek/online-mmo-game-map-editor/blob/e87be97051c87f573f5338f7eb9b3b0d438ece47/README/13.JPG)
-![1](https://github.com/s2023alek/online-mmo-game-map-editor/blob/e87be97051c87f573f5338f7eb9b3b0d438ece47/README/14.JPG)
-![1](https://github.com/s2023alek/online-mmo-game-map-editor/blob/e87be97051c87f573f5338f7eb9b3b0d438ece47/README/15.JPG)
-![1](https://github.com/s2023alek/online-mmo-game-map-editor/blob/e87be97051c87f573f5338f7eb9b3b0d438ece47/README/16.JPG)
-![1](https://github.com/s2023alek/online-mmo-game-map-editor/blob/e87be97051c87f573f5338f7eb9b3b0d438ece47/README/17.JPG)
-![1](https://github.com/s2023alek/online-mmo-game-map-editor/blob/e87be97051c87f573f5338f7eb9b3b0d438ece47/README/18.JPG)
-![1](https://github.com/s2023alek/online-mmo-game-map-editor/blob/e87be97051c87f573f5338f7eb9b3b0d438ece47/README/19.JPG)
+![1](https://github.com/s2023alek/online-mmo-game-map-editor/blob/193b6671fdd3d35eea445b8965b2053f60985019/README/13.PNG)
+![1](https://github.com/s2023alek/online-mmo-game-map-editor/blob/193b6671fdd3d35eea445b8965b2053f60985019/README/14.PNG)
+![1](https://github.com/s2023alek/online-mmo-game-map-editor/blob/193b6671fdd3d35eea445b8965b2053f60985019/README/15.PNG)
+![1](https://github.com/s2023alek/online-mmo-game-map-editor/blob/193b6671fdd3d35eea445b8965b2053f60985019/README/16.PNG)
+![1](https://github.com/s2023alek/online-mmo-game-map-editor/blob/193b6671fdd3d35eea445b8965b2053f60985019/README/17.PNG)
+![1](https://github.com/s2023alek/online-mmo-game-map-editor/blob/193b6671fdd3d35eea445b8965b2053f60985019/README/18.PNG)
+![1](https://github.com/s2023alek/online-mmo-game-map-editor/blob/193b6671fdd3d35eea445b8965b2053f60985019/README/19.PNG)
 
 нажать по фону карты (зеленая трава) затем удерживая клавишу R поводить курсором по клеткам.
 Фон карты можно перетащить курсором чтобы редактировать клетки находящиеся вне области просмотра.  
-![1](https://github.com/s2023alek/online-mmo-game-map-editor/blob/e87be97051c87f573f5338f7eb9b3b0d438ece47/README/20.JPG)
+![1](https://github.com/s2023alek/online-mmo-game-map-editor/blob/193b6671fdd3d35eea445b8965b2053f60985019/README/20.PNG)
 
 по желанию добавить еще один образец с произвольным количеством слоев состоящих из маски и картинки.  
-![1](https://github.com/s2023alek/online-mmo-game-map-editor/blob/e87be97051c87f573f5338f7eb9b3b0d438ece47/README/21.JPG)
+![1](https://github.com/s2023alek/online-mmo-game-map-editor/blob/193b6671fdd3d35eea445b8965b2053f60985019/README/21.PNG)
 
 по желанию аналогично назначить клавишу (другую) и также поводить курсором(перед этим нажав на фон карты чтобы она получила фокус)
 Затем последовательно сохранить на сервер изображение карты, данные( нужны чтобы заново не набирать все образцы и саму карту), затем нажать на кнопку выход(3)  
-![1](https://github.com/s2023alek/online-mmo-game-map-editor/blob/e87be97051c87f573f5338f7eb9b3b0d438ece47/README/22.JPG)
-![1](https://github.com/s2023alek/online-mmo-game-map-editor/blob/e87be97051c87f573f5338f7eb9b3b0d438ece47/README/23.JPG)
+![1](https://github.com/s2023alek/online-mmo-game-map-editor/blob/193b6671fdd3d35eea445b8965b2053f60985019/README/22.PNG)
+![1](https://github.com/s2023alek/online-mmo-game-map-editor/blob/193b6671fdd3d35eea445b8965b2053f60985019/README/23.PNG)
 
 перетащить зеленый ромб так чтобы он по клеткам вписывался в фон. Зеленый ромб – это область куда можно ставить здания и декорации. Состоит из таких же сегментов по размеру что и фон.  
-![1](https://github.com/s2023alek/online-mmo-game-map-editor/blob/e87be97051c87f573f5338f7eb9b3b0d438ece47/README/24.JPG)
-![1](https://github.com/s2023alek/online-mmo-game-map-editor/blob/e87be97051c87f573f5338f7eb9b3b0d438ece47/README/25.JPG)
+![1](https://github.com/s2023alek/online-mmo-game-map-editor/blob/193b6671fdd3d35eea445b8965b2053f60985019/README/24.PNG)
+![1](https://github.com/s2023alek/online-mmo-game-map-editor/blob/193b6671fdd3d35eea445b8965b2053f60985019/README/25.PNG)
 
 установить координаты иконки для локации на карте мира (навести на желаемое место затем нажать левую кнопку мыши)
 Сохранить карту.  
-![1](https://github.com/s2023alek/online-mmo-game-map-editor/blob/e87be97051c87f573f5338f7eb9b3b0d438ece47/README/26.JPG)
-![1](https://github.com/s2023alek/online-mmo-game-map-editor/blob/e87be97051c87f573f5338f7eb9b3b0d438ece47/README/27.JPG)
-![1](https://github.com/s2023alek/online-mmo-game-map-editor/blob/e87be97051c87f573f5338f7eb9b3b0d438ece47/README/28.JPG)
-![1](https://github.com/s2023alek/online-mmo-game-map-editor/blob/e87be97051c87f573f5338f7eb9b3b0d438ece47/README/29.JPG)
+![1](https://github.com/s2023alek/online-mmo-game-map-editor/blob/193b6671fdd3d35eea445b8965b2053f60985019/README/26.PNG)
+![1](https://github.com/s2023alek/online-mmo-game-map-editor/blob/193b6671fdd3d35eea445b8965b2053f60985019/README/27.PNG)
+![1](https://github.com/s2023alek/online-mmo-game-map-editor/blob/193b6671fdd3d35eea445b8965b2053f60985019/README/28.PNG)
+![1](https://github.com/s2023alek/online-mmo-game-map-editor/blob/193b6671fdd3d35eea445b8965b2053f60985019/README/29.PNG)
 
