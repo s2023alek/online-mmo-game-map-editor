@@ -1,0 +1,794 @@
+// Project BGTileMapEditorFile
+package main {
+	
+	//{ =*^_^*= import
+	
+	import com.adobe.images.PNGEncoder;
+	import flash.display.Bitmap;
+	import flash.display.BitmapData;
+	import flash.display.DisplayObject;
+	import flash.display.DisplayObjectContainer;
+	import flash.display.Sprite;
+	import flash.display.StageScaleMode;
+	import flash.events.Event;
+	import flash.events.MouseEvent;
+	import flash.events.TimerEvent;
+	import flash.geom.Point;
+	import flash.geom.Rectangle;
+	import flash.net.FileFilter;
+	import flash.net.FileReference;
+	import flash.text.TextField;
+	import flash.ui.Keyboard;
+	import flash.utils.ByteArray;
+	import flash.utils.Timer;
+	import lib.BGTileMapEditorFileLibrary;
+	import org.jinanoimateydragoncat.input.Kb;
+	//} =*^_^*= END OF import
+	
+	
+	/**
+	 * Main
+	 * @author Jinanoimatey Dragoncat
+	 * @version 0.0.0
+	 * @created 
+	 */
+	public class BGTileMapEditorFile extends Sprite {
+		
+		//{ =*^_^*= CONSTRUCTOR
+		
+		function BGTileMapEditorFile () {
+			if (stage) {init();}
+			else {addEventListener(Event.ADDED_TO_STAGE, init);}
+		}
+		
+		private function init(e:Event=null):void {
+			//{ ^_^ prepare
+			BGTileMapEditorFileLibrary.initialize(libraryInitialized);
+			if (e) {removeEventListener(e.type, arguments.callee);}
+			//} ^_^ END OF prepare
+		}
+		private function libraryInitialized():void {
+			// entry point
+			stage.scaleMode=StageScaleMode.NO_SCALE;
+			//prepare keyboard
+			k = new Kb(this);
+			k.onKeyDown = keyDown;
+			k.onKeyUp = keyUp;
+			
+			// prepare display
+			container.x = CX;
+			container.y = CY;
+			
+			run();
+			
+			buttonsPanel = new EditorRightPanelButtons(0, screenH-200, el_buttonsPanel);
+			addChild(buttonsPanel.get_container()).x=screenW-buttonsPanel.get_container().width;
+			vpW-=screenW-buttonsPanel.get_container().width;
+			
+			panelSamples = new EditorSamplePanel(200, vpH);
+			addChild(panelSamples.get_container()).x=0;
+			panelMasks = new EditorMasksPanel(300, vpH);
+			panelMasks.get_container().visible=false;
+			addChild(panelMasks.get_container()).x=200;
+			panel = new EditorBottomPanel(screenW, screenH-vpH);
+			addChild(panel.get_container()).y=vpH;
+			
+			
+			preparePanel();
+			prepareMasksPanel();
+			prepareSamplesPanel();
+			prepareStateLine();
+			
+			//settings window
+			panelCfg=new SettingsPanel(screenW, screenH);
+			addChild(panelCfg).visible=false;
+			prepareSettingsPanel();
+			
+			
+			sl('Ready');
+		}
+		//} =*^_^*= END OF CONSTRUCTOR
+		
+		
+		//{ =*^_^*= state
+		private const BLOCK_WIDTH:uint = 100;
+		private const BLOCK_HEIGHT:uint = 50;
+		
+		private var MAP_WIDTH:uint = 8;
+		private var MAP_HEIGHT:uint = MAP_WIDTH*3;
+		
+		
+		private var screenW:uint=1000;
+		private var screenH:uint=700;
+		
+		private var vpW:uint=1000-200;
+		private var vpH:uint=500;
+		
+		private var CX:uint=200;
+		private var CY:uint=0;
+		//} =*^_^*= END OF state
+		
+		private function run():void {
+			textures = [
+				BGTileMapEditorFileLibrary.image0
+				,BGTileMapEditorFileLibrary.image1
+				,BGTileMapEditorFileLibrary.image2
+				,BGTileMapEditorFileLibrary.image3
+				,BGTileMapEditorFileLibrary.image4
+				,BGTileMapEditorFileLibrary.image5
+			];
+			//container mask
+			containerMask.graphics.beginFill(0);
+			containerMask.graphics.drawRect(0,0,vpW,vpH);
+			containerMask.x = container.x;
+			containerMask.y = container.y;
+			container.mask = containerMask;
+			addChild(container);
+			container.cacheAsBitmap = true;
+			//listeners:
+			container.mouseChildren = false;
+			container.addEventListener(MouseEvent.MOUSE_DOWN, function (e:Event):void {
+					Event(e).stopImmediatePropagation();
+					mouseIsDown = true;
+					Sprite(container).startDrag();
+				}
+			);
+			container.addEventListener(MouseEvent.MOUSE_UP, function (e:Event):void {mouseIsDown=false;stopDrag(); } );
+			//stage
+			stage.addEventListener(MouseEvent.MOUSE_MOVE, el_stage_mouse_move);
+			stage.addEventListener(MouseEvent.MOUSE_DOWN, function (e:Event):void {container.x=CX;container.y=CY;});
+			//run:
+			clearMap();
+			contents.mask = createBGImageRectMask();
+			prepareMap();
+			drawMap();
+		}
+		
+		
+		//{ =*^_^*= mouse
+		private function el_stage_mouse_move(e:Object):void {
+			if (mouseIsDown) { return;}
+			if (Math.abs(oldX - stage.mouseX) > BLOCK_WIDTH / 4 || Math.abs(oldY - stage.mouseY) > BLOCK_HEIGHT / 4) {
+				oldX = stage.mouseX;
+				oldY = stage.mouseY;
+			} else { return;}
+			
+			if (changeTex == -1 && changeMask == -1) { return;}//nothing to perform - no need for block search
+			
+			var image:Bitmap;
+			a1:for (var l:int = 0; l < MAP_WIDTH; l++) {
+				for (var c:int = 0; c < MAP_HEIGHT; c++) {
+					image = images[l][c];
+					if (image && image.hitTestPoint(stage.mouseX, stage.mouseY)) {
+						if (image.bitmapData.getPixel32(image.mouseX,image.mouseY)  > 0) {
+							//contents.removeChild(image);
+							//images[l][c] = null;
+							break a1;
+						}
+					}
+				}
+			}
+			if (!image||(l==MAP_WIDTH||c==MAP_HEIGHT)) { return; }//no image under cursor
+			
+			//change texture
+			if (changeTex != -1&&map[l][c]!=changeTex) {
+				map[l][c] = changeTex;
+				//Bitmap(images[l][c]).bitmapData.dispose();
+				//Bitmap(images[l][c]).bitmapData = drawBDTile(textures, changeTex);
+				redrawTile(l, c);
+			}
+			
+			if (changeMask != -1) {
+				//trace(x+'.'+c, 'before:'+mapMask[l][c]);
+				if (changeMask == 0) {
+					mapMask[l][c] = '0.0';
+				} else if (changeMask < 5) {//left
+					if (mapMask[l][c] == null||String(mapMask[l][c]).split('.')<2) {
+						mapMask[l][c] = String(changeMask)+'.0';
+					} else {
+						mapMask[l][c] = String(changeMask)+String(mapMask[l][c]).substr(String(mapMask[l][c]).indexOf('.'));
+					}
+				} else {//right
+					if (mapMask[l][c] == null||String(mapMask[l][c]).split('.')<2) {
+						mapMask[l][c] = '0.'+String(changeMask);
+					} else {
+						mapMask[l][c] = String(mapMask[l][c]).substring(0, String(mapMask[l][c]).indexOf('.')+1) + String(changeMask);
+					}
+				}
+				//trace(x+'.'+c, 'after:'+mapMask[l][c]);
+				//Bitmap(images[l][c]).bitmapData.dispose();
+				//Bitmap(images[l][c]).bitmapData = 
+				redrawTile(l, c);
+			}
+		}
+		private var mouseIsDown:Boolean;
+		private var oldX:Number=0;
+		private var oldY:Number=0;
+		//} =*^_^*= END OF mouse
+		
+		//{ =*^_^*= keyboard
+		private function keyDown(keyCode:uint):void {
+			var kc:Array = [];
+			var kn:Array = ['1','2','3','4', '5', '6'];
+			for (var i:int = 0; i < kn.length; i++) {kc.push(uint(String(kn[i]).charCodeAt()));}
+			var kn0:Array=[
+				''
+				,'w'//1
+				,'d'//2
+				,'x'//3
+				,'a'//4
+				
+				,'t'//5
+				,'h'//6
+				,'b'//7
+				,'f'//8
+				
+				,'u'//9
+				,'i'//10
+				,'j'//11
+				,'k'//12
+			];
+			var kc0:Array = [];
+			for (i = 0; i < kn0.length; i++) {kc0.push(String(kn0[i]).toUpperCase().charCodeAt());}
+			
+			if (kc.indexOf(keyCode) != -1) {
+				changeTex = kc.indexOf(keyCode);
+			} else if (keyCode==Keyboard.SPACE) {
+				changeMask = 0;
+				//trace('changeMask changed to Space');
+			} else if (kc0.indexOf(keyCode) != -1) {
+				changeMask = kc0.indexOf(keyCode);
+				//trace('changeMask changed to '+kn0[kc0.indexOf(keyCode)]+' ;iindex:'+kc0.indexOf(keyCode));
+			}
+			if (changeTex != -1||changeMask!=-1) {
+				oldX = stage.mouseX+BLOCK_WIDTH;
+				oldY = stage.mouseY + BLOCK_HEIGHT;
+				el_stage_mouse_move(null);
+			}
+		}
+		
+		private function keyUp(keyCode:uint):void {
+			changeTex = -1;
+			changeMask = -1;
+		}
+		private var k:Kb;
+		private var changeMask:int = -1;
+		private var changeTex:int = -1;
+		//} =*^_^*= END OF keyboard
+		
+		//{ =*^_^*= display
+		private function drawMap(bitmapMode:Boolean = false):void {
+			if (bitmapMode) {prepareBitmap();}
+			var image:Bitmap;
+			for (var l:int = 0; l < MAP_WIDTH; l++) {
+				if (!images[l]) {images[l] = [];}
+				for (var c:int = 0; c < MAP_HEIGHT; c++) {
+					image = new Bitmap(drawBGTile(l, c, textures, map, mapMask), 'auto', true);
+					
+					if (!bitmapMode) {
+						image.x = getScreenX(l, c)-BLOCK_WIDTH/2;
+						image.y = getScreenY(l, c)-BLOCK_HEIGHT/2;
+						images[l][c] = image;
+						contents.addChild(image);
+					} else {
+						bg.bitmapData.copyPixels(
+							image.bitmapData
+							,image.bitmapData.rect
+							, new Point(getScreenX(l, c) - BLOCK_WIDTH / 2, getScreenY(l, c) - BLOCK_HEIGHT / 2)
+							, BGTileMapEditorFileLibrary.mask_tile
+							, new Point(0, 0)
+							, true
+						);
+					}
+					
+				}
+			}
+		}
+		
+		private function redrawTile(x:uint, y:uint):void {
+			var l:int = x;
+			var c:int = y;
+			var image:Bitmap=images[l][c];
+			var ibd:BitmapData=drawBGTile(l, c, textures, map, mapMask);
+			if (image) {
+				image.bitmapData.dispose();
+				image.bitmapData=ibd;
+			} else {
+				image = new Bitmap(ibd, 'auto', true);
+				images[l][c] = image;
+				image.x = getScreenX(l, c)-BLOCK_WIDTH/2;
+				image.y = getScreenY(l, c)-BLOCK_HEIGHT/2;
+				contents.addChild(image);
+			}
+		}
+		private function drawBGTile(x:uint, y:uint, textures:Array, map:Array, mapMask:Array):BitmapData {
+			var targetImage:BitmapData;
+			var maskImage:BitmapData;
+			var mask:BitmapData;
+			var maskTile0:uint;
+			var maskTile1:uint;
+			if (mapMask[x][y]!=null) {
+				maskTile0=parseInt(String(mapMask[x][y]).split('.')[0]);// .
+				maskTile1=parseInt(String(mapMask[x][y]).split('.')[1]);// | |_ 
+			}
+			
+			targetImage = BitmapData(textures[map[x][y]]).clone();
+			
+			if (maskTile0==0&&maskTile1==0) {return targetImage;}
+			
+			if (maskTile0>0) {
+				mask=masks_[maskTile0][1];
+				maskImage=detectMaskImage(x,y, maskTile0);
+				if (maskImage) {
+					targetImage = drawBDTile(textures, map[x][y], maskImage, mask);
+				}
+			}
+			if (maskTile1>0) {
+				mask=masks_[maskTile1][1];
+				maskImage=detectMaskImage(x,y, maskTile1);
+				if (maskImage) {
+					targetImage = drawBDTile(textures, map[x][y], maskImage, mask, targetImage);
+				}
+			}
+			
+			return targetImage;
+		}
+		
+		//{ =*^_^*= working with masks
+		private function detectMaskImage(x:uint, y:uint, targetTileNum:uint):BitmapData {
+			const T:Point=new Point(0,-2);
+			const R:Point=new Point(+1,0);
+			const B:Point=new Point(0,+2);
+			const L:Point=new Point(-1,0);
+			
+			const TR:Point=new Point(+1,-1);//%2!=0
+			const BR:Point=new Point(+1,+1);//%2!=0
+			const BL:Point=new Point(-1,+1);//%2==0
+			const TL:Point=new Point(-1,-1);//%2==0
+			
+			const TRa:Point=new Point(0,-1);//%2==0
+			const BRa:Point=new Point(0,+1);//%2==0
+			const BLa:Point=new Point(0,+1);//%2!=0
+			const TLa:Point=new Point(0,-1);//%2!=0
+			
+			var directions:Array = [
+				[0,0]
+				,[T,T],[R,R],[B,B],[L,L]
+				//,[T,T],[R,R],[B,B],[L,L]
+				,[TL,TLa],[TRa,TR],[BL,BLa],[BL,BLa]
+				,[TL,TLa],[TRa,TR],[BL,BLa],[BRa,BR]
+			];
+			
+			var direction:Point=directions[targetTileNum][y%2];
+			
+			var tMX:int=x+direction.x;
+			var tMY:int=y+direction.y;
+			if (tMY>=0&&tMX>=0&&tMX<MAP_WIDTH&&tMY<MAP_HEIGHT) {
+				//exist
+				return drawBDTile(textures, map[tMX][tMY]);
+			}
+			return null;
+		}
+		//} =*^_^*= END OF working with masks
+		
+		
+		private function drawBDTile(textures:Array, textSN:uint, maskImage:BitmapData=null, mask:BitmapData=null, src:BitmapData=null):BitmapData {
+			var targetImage:BitmapData;
+			if (src) {
+				targetImage=src;
+			} else {
+				targetImage= BitmapData(textures[textSN]).clone();
+			}
+			if (maskImage) {
+				targetImage.copyPixels(maskImage, maskImage.rect, new Point(0, 0), mask, new Point(0, 0), true);
+			}
+			return targetImage;
+		}
+		
+		private function saveImage():void {
+			sl('SaveImage>generating image data');
+			var fr:FileReference=new FileReference();
+			fr.addEventListener(Event.SELECT, function(e:Object):void {sl('SaveImage>Saving');});
+			fr.addEventListener(Event.COMPLETE, function(e:Object):void {sl('SaveImage>Complete');});
+			fr.addEventListener(Event.CANCEL, function(e:Object):void {sl('SaveImage>Cancelled by user');});
+			
+			var data:ByteArray;
+			waitForRender(function():void{
+				drawMap(true);
+				data=PNGEncoder.encode(bg.bitmapData);
+				fr.save(data, 'MapName.png');
+			});
+		}
+		
+		
+		public function getScreenX(wx:Number, wy:Number):Number {
+			return wx*BLOCK_WIDTH+wy%2*BLOCK_WIDTH/2;
+		}
+		public function getScreenY(wx:Number, wy:Number):Number {
+			return wy*BLOCK_HEIGHT/2;
+		}
+		
+		//} =*^_^*= END OF display
+		
+		//{ =*^_^*= display &data
+		private function clearMap():void {
+			while(container.numChildren>0) {container.removeChildAt(0);}
+			contents = new Sprite();
+			contents.cacheAsBitmap = true;
+			container.addChild(contents);
+		}
+		private function clearMapData():void {
+			map=[];
+			mapMask=[];
+			images=[];
+		}
+		//} =*^_^*= END OF display &data
+		
+		//{ =*^_^*= data
+		
+		private function saveMap():void {
+			var fr:FileReference=new FileReference();
+			fr.addEventListener(Event.SELECT, function(e:Object):void {
+				sl('Save map data>Saving');
+			});
+			fr.addEventListener(Event.COMPLETE, function(e:Object):void {
+				sl('Save map data>Complete');
+			});
+			sl('Save map data>Cancelled by user');
+			fr.save(JSON.stringify({w:MAP_WIDTH, h:MAP_HEIGHT, map:map, mask:mapMask}), 'MapName.BGTileMapData');
+		}
+		
+		private function loadMap():void {
+			clearMap();
+			clearMapData();
+			sl('Load map data>Cancelled by user');
+			
+			var fr:FileReference=new FileReference();
+			fr.addEventListener(Event.SELECT, function(e:Object):void {
+				sl('Load map data>Loading');
+				waitForRender(function():void{fr.load();});
+			});
+			fr.addEventListener(Event.COMPLETE, function(e:Object):void {
+					try {
+						var d:Object = JSON.parse(fr.data);
+						MAP_WIDTH=d.w;
+						MAP_HEIGHT=d.h;
+						map=d.map;
+						mapMask=d.mask;
+						contents.mask = createBGImageRectMask();
+						drawMap();
+						sl('Load map data>Loaded');
+					} catch (e:Error) {
+						sl('Load map data>Error:'+e.message);
+					}
+				}
+			);
+			fr.browse([new FileFilter('BGTileMapEditorFile map data files', '*.BGTileMapData')]);	
+		}
+		
+		private function prepareMap():void {
+			images = [];
+			map = [];
+			mapMask = [];
+			for (var c:int = 0; c < MAP_WIDTH; c++) {
+				if (!map[c]) {map[c] = [];}
+				if (!mapMask[c]) {mapMask[c] = [];}
+				for (var l:int = 0; l < MAP_HEIGHT; l++) {
+					map[c][l] = 0;
+					mapMask[c][l] = '0.0';
+				}
+			}
+		}
+		//} =*^_^*= END OF data
+		
+		
+		
+		//{ =*^_^*= containers and main bitmap
+		private function prepareBitmap():void {
+			bg = new Bitmap(new BitmapData(
+					BLOCK_WIDTH * MAP_WIDTH - BLOCK_WIDTH / 2
+					,BLOCK_HEIGHT/2*(MAP_HEIGHT-1)
+					,true
+					,0
+				)
+				,'auto'
+				,true
+			);
+		}
+		
+		private function createBGImageRectMask():Sprite {
+			var s:Sprite = container.addChild(new Sprite());
+			s.graphics.beginFill(0);
+			s.graphics.drawRect(0, 0
+				,BLOCK_WIDTH * MAP_WIDTH - BLOCK_WIDTH / 2
+				,BLOCK_HEIGHT/2*(MAP_HEIGHT-1)	
+			);
+			return s;
+		}
+		//} =*^_^*= END OF containers and main bitmap
+		
+		//{ =*^_^*= =*^_^*= User Interface
+		
+		//{ =*^_^*= StateLine
+		private function waitForRender(f:Function):void {
+			slt.addEventListener(TimerEvent.TIMER_COMPLETE, function(e:Event):void{
+				e.target.removeEventListener(TimerEvent.TIMER_COMPLETE, arguments.callee);
+				f();
+			});
+			slt.reset();
+			slt.start();
+		}
+		
+		
+		private function sl(a:String):void {
+			slDT.text=a;
+		}
+		
+		private function prepareStateLine():void {
+			sls=addChild(new BGTileMapEditorFileLibrary.LStatusLine());
+			sls.x = Math.max(CX+vpW/2-sls.width/2, 200+300);//masks and samples panels
+			slDT=sls.getChildByName('dt0');
+			sl('');
+		}
+		
+		private var slt:Timer=new Timer(300, 1);
+		private var slDT:TextField;
+		private var sls:DisplayObjectContainer;
+		//} =*^_^*= END OF StateLine
+		
+		//{ =*^_^*= buttons
+		private function el_buttonsPanel(bID:uint):void {
+			var w:uint;
+			var h:uint;
+			var title:String='no title';
+			var name:String='';
+			switch (bID) {
+			
+			case EditorRightPanelButtons.ID_BUTTON_SAVE0:
+				saveImage();
+				break;
+			case EditorRightPanelButtons.ID_BUTTON_NEW:
+				panel.showSavePanel(0, '', 3, 3);
+				break;
+			case EditorBottomPanel.ID_BUTTON_PANEL_CLOSE:
+				panel.hideSavePanel();
+				break;
+			case EditorBottomPanel.ID_BUTTON_PANEL_SAVE:
+				title=panel.getUintInput(EditorBottomPanel.ID_INPUT_TEXT_0);
+				name=panel.getUintInput(EditorBottomPanel.ID_INPUT_TEXT_1);
+				w=panel.getUintInput(EditorBottomPanel.ID_INPUT_UINT_0);
+				h = panel.getUintInput(EditorBottomPanel.ID_INPUT_UINT_1);
+				if (w < 3 || h < 3) {
+					panel.showMsgPanel('map width and height must be >= 3', 'check input');
+					break;
+				}
+				sl('NewMap>generating new map data');
+				waitForRender(function():void{
+					MAP_WIDTH = w;
+					MAP_HEIGHT = h;
+					clearMap();
+					clearMapData();
+					contents.mask = createBGImageRectMask();
+					prepareMap();
+					drawMap();
+					panel.hideSavePanel();
+					sl('NewMap>complete');
+				});
+				break;
+				
+			case EditorRightPanelButtons.ID_BUTTON_LOAD:
+				loadMap();
+				break;
+			case EditorRightPanelButtons.ID_BUTTON_SETTINGS:
+				panelCfg.visible=true;
+				break;
+			case EditorRightPanelButtons.ID_BUTTON_SAVE:
+				saveMap();
+				//panel.showMsgPanel('not implemented yet ^_^', 'not implemented yet ^_^');
+				break;
+			case EditorRightPanelButtons.ID_BUTTON_LOG:
+				panel.showMsgPanel('not implemented yet ^_^', 'not implemented yet ^_^');
+				break;
+			case EditorRightPanelButtons.ID_BUTTON_NEW_MASK:
+				panel.showMsgPanel('not implemented yet ^_^', 'not implemented yet ^_^');
+				break;
+			
+			}
+		}
+		private var buttonsPanel:EditorRightPanelButtons;
+		//} =*^_^*= END OF buttons
+		
+		//{ =*^_^*= panel		
+		private function preparePanel():void {
+			var vs:Vector.<String> = new Vector.<String>();
+			var vim:Vector.<DisplayObject> = new Vector.<DisplayObject>();
+			var vid:Vector.<uint> = new Vector.<uint>();
+			var keyNames:Array = ['1', '2', '3', '4', '5', '6'];
+			var numImages:uint = keyNames.length;
+			for (var i:int = 0; i < textures.length; i++) {
+				vs.push('hold "'+keyNames[i]+'" key');
+				vim.push(new Bitmap(BitmapData(textures[i]).clone()));
+				vid.push(i);
+			}
+			
+			masks_ = [
+				['Space', BGTileMapEditorFileLibrary.mask_tile]
+				    
+				,['w', BGTileMapEditorFileLibrary.mask0top]
+				,['d', BGTileMapEditorFileLibrary.mask0right]
+				,['x', BGTileMapEditorFileLibrary.mask0bottom]
+				,['a', BGTileMapEditorFileLibrary.mask0left]
+				    
+				,['t', BGTileMapEditorFileLibrary.mask2top]
+				,['h', BGTileMapEditorFileLibrary.mask2right]
+				,['b', BGTileMapEditorFileLibrary.mask2bottom]
+				,['f', BGTileMapEditorFileLibrary.mask2left]
+				    
+				,['u', BGTileMapEditorFileLibrary.mask1topleft]
+				,['i', BGTileMapEditorFileLibrary.mask1topright]
+				,['j', BGTileMapEditorFileLibrary.mask1bottomleft]
+				,['k', BGTileMapEditorFileLibrary.mask1bottomright]
+				
+			];
+			
+			for (i = 0; i < masks_.length; i++) {
+				vs.push('hold "'+masks_[i][0]+'" key');
+				vim.push(new Bitmap(BitmapData(masks_[i][1]).clone()));
+				vid.push(i+numImages);
+				keyNames.push(masks_[i][0]);
+			}
+			
+			panel.setImageListener(function(a:uint):void {
+				panel.showMsgPanel('hold "'+keyNames[a]+'" key on the keyboard, while moving mouse on map', 'tip:');
+			});
+			//panel.setComboBoxActionListener(function(a:uint):void{trace('cb:'+a);});
+			panel.setContent(vs, vim, vid, 2);
+			//panel.setComboBoxList(['one', 'two', 'three']);
+			
+			panel.setButtonListener(el_buttonsPanel);
+			
+		}
+		private var panel:EditorBottomPanel;
+		//} =*^_^*= END OF panel
+		
+		//{ =*^_^*= masks panel
+		private function setMasksPanelContent():void {
+			var vs:Vector.<String> = new Vector.<String>();
+			var vim:Vector.<DisplayObject> = new Vector.<DisplayObject>();
+			var vid:Vector.<uint> = new Vector.<uint>();
+			
+			var maskss:Array = [
+				['Space', BGTileMapEditorFileLibrary.mask_tile]
+				
+				,['w', BGTileMapEditorFileLibrary.mask0top]
+				,['d', BGTileMapEditorFileLibrary.mask0right]
+				,['x', BGTileMapEditorFileLibrary.mask0bottom]
+				,['a', BGTileMapEditorFileLibrary.mask0left]
+				    
+				,['t', BGTileMapEditorFileLibrary.mask2top]
+				,['h', BGTileMapEditorFileLibrary.mask2right]
+				,['b', BGTileMapEditorFileLibrary.mask2bottom]
+				,['f', BGTileMapEditorFileLibrary.mask2left]
+				    
+				,['u', BGTileMapEditorFileLibrary.mask1topleft]
+				,['i', BGTileMapEditorFileLibrary.mask1topright]
+				,['j', BGTileMapEditorFileLibrary.mask1bottomleft]
+				,['k', BGTileMapEditorFileLibrary.mask1bottomright]
+				
+			];
+			
+			for (i = 0; i < maskss.length; i++) {
+				vs.push('рисунок '+i);
+				vim.push(new Bitmap(BitmapData(masks_[i][1]).clone()));
+				vid.push(i);
+			}
+			panelMasks.setContent(vs, vim, vid, 3);
+		}	
+		
+		private function prepareMasksPanel():void {
+			panelMasks.setImageListener(function(a:uint):void {
+				sl('masks panel>item selected:item index'+a);
+				panelMasks.get_container().visible=false;
+			});
+			setMasksPanelContent();
+		}
+		private var panelMasks:EditorMasksPanel;
+		//} =*^_^*= END OF masks panel
+		
+		//{ =*^_^*= samples panel
+		private function setSamplesPanelContent():void {
+			var vs:Vector.<String> = new Vector.<String>();
+			var vim:Vector.<DisplayObject> = new Vector.<DisplayObject>();
+			var vim0:Vector.<DisplayObject> = new Vector.<DisplayObject>();
+			var vid:Vector.<uint> = new Vector.<uint>();
+			
+			var maskss:Array = [
+				['Sample name 0', BGTileMapEditorFileLibrary.image0, BGTileMapEditorFileLibrary.mask_tile]
+				,['Sample name 1', BGTileMapEditorFileLibrary.image1, BGTileMapEditorFileLibrary.mask0bottom]
+				,['Sample name 3', BGTileMapEditorFileLibrary.image2, BGTileMapEditorFileLibrary.mask0left]
+				,['Sample name 4', BGTileMapEditorFileLibrary.image3, BGTileMapEditorFileLibrary.mask0right]
+				,['Sample name 5', BGTileMapEditorFileLibrary.image4, BGTileMapEditorFileLibrary.mask0top]
+				,['Sample name 6', BGTileMapEditorFileLibrary.image5, BGTileMapEditorFileLibrary.mask1bottomleft]
+				,['Sample name 7', BGTileMapEditorFileLibrary.image3, BGTileMapEditorFileLibrary.mask1topleft]
+				,['Sample name 1', BGTileMapEditorFileLibrary.image1, BGTileMapEditorFileLibrary.mask0bottom]
+				,['Sample name 3', BGTileMapEditorFileLibrary.image2, BGTileMapEditorFileLibrary.mask0left]
+				,['Sample name 4', BGTileMapEditorFileLibrary.image3, BGTileMapEditorFileLibrary.mask0right]
+				,['Sample name 5', BGTileMapEditorFileLibrary.image4, BGTileMapEditorFileLibrary.mask0top]
+				,['Sample name 6', BGTileMapEditorFileLibrary.image5, BGTileMapEditorFileLibrary.mask1bottomleft]
+				,['Sample name 7', BGTileMapEditorFileLibrary.image3, BGTileMapEditorFileLibrary.mask1topleft]
+				
+			];
+			
+			for (i = 0; i < maskss.length; i++) {
+				vs.push('рисунок '+i);
+				vim.push(new Bitmap(BitmapData(maskss[i][1]).clone()));
+				vim0.push(new Bitmap(BitmapData(maskss[i][2]).clone()));
+				vid.push(i);
+			}
+			panelSamples.setContent(vs, vim, vim0, vid, 1);
+		}	
+		
+		private function prepareSamplesPanel():void {
+			panelSamples.setImageListener(function(imageID:uint, buttonID:uint):void {
+				sl('samples panel>item selected:item index'+imageID+'button:'+buttonID);
+				if (buttonID==1) {panelMasks.get_container().visible=true;}
+			});
+			setSamplesPanelContent();
+		}
+		private var panelSamples:EditorSamplePanel;
+		//} =*^_^*= END OF masks panel
+		
+		//{ =*^_^*= settings wnd
+		private function prepareSettingsPanel():void {
+			panelCfg.setButtonListener(function(buttonID:uint):void{
+				switch (buttonID) {
+				
+				case SettingsPanel.ID_BUTTON_GET_SAMPLE_FILES:
+					sl('Settings>get sample files: not implemented yet');
+					break;
+				case SettingsPanel.ID_BUTTON_CLOSE:
+					panelCfg.visible=false;
+					break;
+				
+				
+				}
+			});
+		}
+		private var panelCfg:SettingsPanel;
+		//} =*^_^*= END OF settings wnd
+		
+		//} =*^_^*= =*^_^*= END OF User Interface
+		
+		
+		
+		//{ =*^_^*= private		
+		/**
+		 * [][]
+		 */
+		private var mapMask:Array = [];
+		private var map:Array = [];
+		private var masks_:Array;
+		/**
+		 * BitmapData
+		 */
+		private var textures:Array;
+		
+		private var bg:Bitmap;
+		private var container:DisplayObjectContainer = new Sprite();
+		private var contents:DisplayObjectContainer;
+		private var images:Array=[];
+		private var containerMask:Sprite=new Sprite();
+		//} =*^_^*= END OF private
+		
+	}
+}
+
+
+
+//{ =*^_^*= History
+/* > (timestamp) [ ("+" (added) ) || ("-" (removed) ) || ("*" (modified) )] (text)
+ * > 
+ */
+//} =*^_^*= END OF History
+
+// template last modified:11.03.2011_[18#55#10]_[5]

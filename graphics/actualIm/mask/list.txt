@@ -1,0 +1,3 @@
+tile_mask.png
+mask_base_1_1.png
+mask_base_1_1_var2.png
