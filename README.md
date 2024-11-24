@@ -37,7 +37,7 @@ https://rutube.ru/video/de0451ffc04a63d0866f2f3fe53159e6/
 
 ### инструкция в скриншотах:
 
-ранняя версия интерфейса редактора, с описанием элементов интерфейса:  
+### ранняя версия интерфейса редактора, с описанием элементов интерфейса:  
 ![1](https://github.com/s2023alek/online-mmo-game-map-editor/blob/e87be97051c87f573f5338f7eb9b3b0d438ece47/README/appdesc.PNG)
 ![1](https://github.com/s2023alek/online-mmo-game-map-editor/blob/e87be97051c87f573f5338f7eb9b3b0d438ece47/README/uidesc.PNG)
 
