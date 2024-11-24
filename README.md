@@ -3,7 +3,6 @@
 
 # редактор карт для онлайн ММО с диметрическим(изочетрическим) движком "BGTileMerger"
 
-![1](https://github.com/s2023alek/online-mmo-game-map-editor/blob/e87be97051c87f573f5338f7eb9b3b0d438ece47/README/appdesc.PNG)
 ![1](https://github.com/s2023alek/online-mmo-game-map-editor/blob/e87be97051c87f573f5338f7eb9b3b0d438ece47/README/t.JPG)
 
 # Содержание:
@@ -38,6 +37,8 @@ https://rutube.ru/video/de0451ffc04a63d0866f2f3fe53159e6/
 
 ### инструкция в скриншотах:
 
+ранняя версия интерфейса редактора, с описанием элементов интерфейса:  
+![1](https://github.com/s2023alek/online-mmo-game-map-editor/blob/e87be97051c87f573f5338f7eb9b3b0d438ece47/README/appdesc.PNG)
 ![1](https://github.com/s2023alek/online-mmo-game-map-editor/blob/e87be97051c87f573f5338f7eb9b3b0d438ece47/README/uidesc.PNG)
 
 ![1](https://github.com/s2023alek/online-mmo-game-map-editor/blob/e87be97051c87f573f5338f7eb9b3b0d438ece47/README/a1.PNG)
@@ -46,6 +47,7 @@ https://rutube.ru/video/de0451ffc04a63d0866f2f3fe53159e6/
 ![1](https://github.com/s2023alek/online-mmo-game-map-editor/blob/e87be97051c87f573f5338f7eb9b3b0d438ece47/README/a4.PNG)
 ![1](https://github.com/s2023alek/online-mmo-game-map-editor/blob/e87be97051c87f573f5338f7eb9b3b0d438ece47/README/a5.PNG)
 
+### последняя версия интерфейса редактора:  
 
 
 ждать завершения загрузки редактора карт  
